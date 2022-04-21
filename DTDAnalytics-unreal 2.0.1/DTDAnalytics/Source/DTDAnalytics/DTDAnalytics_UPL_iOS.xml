@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <init>
+        <log text="Copy DTDAnalytics framework..."/>
+        <copyDir src="$S(EngineDir)/Intermediate/UnzippedFrameworks/DTDAnalytics/DTDAnalytics.framework" dst="$S(BuildDir)/Frameworks/DTDAnalytics.framework" />
+    </init>
+</root>
