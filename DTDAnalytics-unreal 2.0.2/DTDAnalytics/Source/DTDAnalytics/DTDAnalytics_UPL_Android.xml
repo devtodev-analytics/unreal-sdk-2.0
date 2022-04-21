@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- plugin additions -->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- initialization log -->
+    <init>
+        <log text="DTDAnalytics init"/>
+    </init>
+
+    <!-- optional updates applied to AndroidManifest.xml -->
+    <androidManifestUpdates>
+        <log text="DTDAnalytics androidManifestUpdates"/>
+        <addPermission android:name="android.permission.INTERNET"/>
+        <addPermission android:name="android.permission.ACCESS_WIFI_STATE"/>
+        <addPermission android:name="android.permission.READ_PHONE_STATE"/>
+        <addAttribute tag="application" name="android:name" value="androidx.multidex.MultiDexApplication"/>
+        <addAttribute tag="activity" name="android:exported" value="true"/>
+    </androidManifestUpdates>
+
+    <!-- optional additions to proguard -->
+    <proguardAdditions>
+        <log text="DTDAnalytics proguardAdditions"/>
+        <insert>
+-keep class com.google.** { *; }
+-keep class androidx.multidex.** { *; }
+-keep class com.devtodev.** { *; }
+-keepclassmembers class com.devtodev.** { *; }
+-dontwarn com.devtodev.**
+
+-keep public class com.epicgames.ue4.GameActivity$DevToDevOnMessageCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterStringCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterBoolCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterIntCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterLongCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevPersistGetterStringCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevPersistGetterLongCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterOptionalLongCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterOptionalFloatCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterOptionalBoolCallback { *; }
+-keep public class com.epicgames.ue4.GameActivity$DevToDevGetterOptionalStringCallback { *; }
+        </insert>
+    </proguardAdditions>
+    
+    <!-- aar importing -->
+    <AARImports>
+        <insertValue value="repository $S(PluginDir)/../../ThirdParty/Android"/>
+        <insertNewline/>
+        <insertValue value="com.devtodev,DTDAnalytics,2.1.4"/>
+        <insertNewline/>
+    </AARImports>
+
+    <!-- Copy the generated resource file to be packaged -->
+    <resourceCopies>
+        <copyDir src="$S(PluginDir)/../../ThirdParty/Android" dst="$S(BuildDir)" />
+    </resourceCopies>
+
+    <!-- Add gradle properties -->
+    <gradleProperties>
+        <insert>
+            android.useAndroidX=true
+            android.enableJetifier=true
+        </insert>
+    </gradleProperties>
+    
+    <!-- app grandle -->
+    <buildGradleAdditions>
+        <insert>
+            allprojects {
+                repositories {
+                    google()
+                    jcenter()
+                    maven {
+                        url 'https://maven.google.com'
+                    }
+                }
+                def classMap = [
+							'android.support.annotation': 'androidx.annotation',
+							'android.support.v4.app.ActivityCompat': 'androidx.core.app.ActivityCompat',
+							'android.support.v4.app.NotificationCompat': 'androidx.core.app.NotificationCompat',
+							'android.support.v4.app.NotificationManagerCompat': 'androidx.core.app.NotificationManagerCompat',
+							'android.support.v4.content.ContextCompat': 'androidx.core.content.ContextCompat',
+							'android.support.v4.content.FileProvider': 'androidx.core.content.FileProvider',
+							'android.support.v13.app.FragmentCompat': 'androidx.legacy.app.FragmentCompat',
+							'android.arch.lifecycle': 'androidx.lifecycle',
+							'android.arch.lifecycle.Lifecycle': 'androidx.lifecycle.Lifecycle',
+							'android.arch.lifecycle.LifecycleObserver': 'androidx.lifecycle.LifecycleObserver',
+							'android.arch.lifecycle.OnLifecycleEvent': 'androidx.lifecycle.OnLifecycleEvent',
+							'android.arch.lifecycle.ProcessLifecycleOwner': 'androidx.lifecycle.ProcessLifecycleOwner',
+						]
+
+						afterEvaluate { project ->
+							project.rootProject.projectDir.traverse(type: groovy.io.FileType.FILES, nameFilter: ~/.*\.java$/) { f ->
+								classMap.each { entry ->
+									if (f.getText('UTF-8').contains(entry.key)) {
+										println "Change ${entry.key} to ${entry.value} in file ${f}"
+										ant.replace(file: f, token: entry.key, value: entry.value)
+									}
+								}
+							}
+				}
+            }
+
+			android {
+				defaultConfig {
+					multiDexEnabled true
+				}
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_1_8
+                    targetCompatibility = JavaVersion.VERSION_1_8
+                }
+			}
+
+            dependencies {
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+                implementation 'androidx.core:core-ktx:1.7.0'
+                implementation 'com.google.code.gson:gson:2.8.6'
+                implementation 'com.google.android.gms:play-services-games:18.0.1'
+                implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+                implementation 'com.android.installreferrer:installreferrer:2.2'
+                implementation 'androidx.multidex:multidex:2.0.1'
+            }
+        </insert>
+    </buildGradleAdditions>
+
+    <!-- Additions to the GameActivity imports in GameActivity.java -->
+    <gameActivityImportAdditions>
+        <insert>
+import com.devtodev.analytics.unrealwrapper.*;
+		</insert>
+    </gameActivityImportAdditions>
+
+    <!-- Additions to the GameActivity class in GameActivity.java -->
+    <gameActivityClassAdditions>
+        <log text="DTDAnalytics gameActivityClassAdditions"/>
+        <insert>
+// Begin DevToDev gameActivityClassAdditions
+public class DevToDevOnMessageCallback implements IGetterIntAndString {
+    public native void callback(int logLevel, String message);
+    
+    public DevToDevOnMessageCallback() {
+
+    }
+    
+    @Override
+    public void onResult(int logLevel, String message) {
+        callback(logLevel, message);
+    }
+}
+
+public class DevToDevGetterStringCallback implements IGetterString {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, String result);
+
+    public DevToDevGetterStringCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(String result) {
+        CallbackHandler(pointer, result);
+    }
+}
+
+public class DevToDevGetterBoolCallback implements IGetterBool {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, boolean result);
+
+    public DevToDevGetterBoolCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Boolean result) {
+        CallbackHandler(pointer, result == null ? false : result.booleanValue());
+    }
+}
+
+public class DevToDevGetterIntCallback implements IGetterInt {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, int result);
+
+    public DevToDevGetterIntCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(int result) {
+        CallbackHandler(pointer, result);
+    }
+}
+
+public class DevToDevGetterLongCallback implements IGetterLong {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, long result);
+
+    public DevToDevGetterLongCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Long result) {
+        CallbackHandler(pointer, result == null ? 0 : result.longValue());
+    }
+}
+
+public class DevToDevPersistGetterStringCallback implements IGetterString {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, String result);
+
+    public DevToDevPersistGetterStringCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(String result) {
+        CallbackHandler(pointer, result);
+    }
+}
+
+public class DevToDevPersistGetterLongCallback implements IGetterLong {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, long result);
+
+    public DevToDevPersistGetterLongCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Long result) {
+        CallbackHandler(pointer, result == null ? 0 : result.longValue());
+    }
+}
+
+public class DevToDevGetterOptionalLongCallback implements IGetterObject {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, boolean success, long result);
+
+    public DevToDevGetterOptionalLongCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Object result) {
+        if (result instanceof Long) {
+            CallbackHandler(pointer, true, (Long)result);
+        } else {
+            CallbackHandler(pointer, false, 0);
+        }
+    }
+}
+
+public class DevToDevGetterOptionalFloatCallback implements IGetterObject {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, boolean success, float result);
+
+    public DevToDevGetterOptionalFloatCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Object result) {
+        if (result instanceof Double) {
+            CallbackHandler(pointer, true, ((Double)result).floatValue());
+        } else {
+            CallbackHandler(pointer, false, 0);
+        }
+    }
+}
+
+public class DevToDevGetterOptionalBoolCallback implements IGetterObject {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, boolean success, boolean result);
+
+    public DevToDevGetterOptionalBoolCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Object result) {
+        if (result instanceof Boolean) {
+            CallbackHandler(pointer, true, (Boolean)result);
+        } else {
+            CallbackHandler(pointer, false, false);
+        }
+    }
+}
+
+public class DevToDevGetterOptionalStringCallback implements IGetterObject {
+
+    private final Object pointer;
+
+    public native void CallbackHandler(Object pointer, boolean success, String result);
+
+    public DevToDevGetterOptionalStringCallback(Object pointer) {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Object result) {
+        if (result instanceof String) {
+            CallbackHandler(pointer, true, (String)result);
+        } else {
+            CallbackHandler(pointer, false, "");
+        }
+    }
+}
+// End DevToDev gameActivityClassAdditions
+        </insert>
+    </gameActivityClassAdditions>
+
+</root>
