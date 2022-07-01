@@ -6,6 +6,8 @@
 
 #include "Platform/PlatformAnalytics.h"
 
+#if PLATFORM_WINDOWS && PLATFORM_32BITS
+
 class WindowsAnalytics : public PlatformAnalytics
 {
 public:
@@ -85,3 +87,5 @@ public:
 private:
 	void WarnAboutNotSupportedArchitecture();
 };
+
+#endif
