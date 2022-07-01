@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Platform/PlatformAnalytics.h"
 
+#if PLATFORM_WINDOWS && PLATFORM_64BITS
+
 class WindowsAnalytics : public PlatformAnalytics
 {
 public:
@@ -84,3 +86,5 @@ public:
 private:
 	const FDTDLogsListenerDelegate* logsListener = nullptr;
 };
+
+#endif
