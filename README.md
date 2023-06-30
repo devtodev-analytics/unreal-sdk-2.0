@@ -2,7 +2,7 @@
 
 ## Latest Version
 
-_July, 2022_ - [v2.0.2](https://github.com/devtodev-analytics/unreal-sdk-2.0/releases/latest)
+_June 30, 2023_ - [v2.1.0](https://github.com/devtodev-analytics/unreal-sdk-2.0/releases/latest)
 
 ## Documentation
 
@@ -10,6 +10,7 @@ _July, 2022_ - [v2.0.2](https://github.com/devtodev-analytics/unreal-sdk-2.0/rel
 * [Basic methods](https://docs.devtodev.com/integration/integration-of-sdk-v2/setting-up-events/basic-methods)
 * [Secondary methods](https://docs.devtodev.com/integration/integration-of-sdk-v2/setting-up-events/secondary-methods)
 * [User profile](https://docs.devtodev.com/integration/integration-of-sdk-v2/setting-up-events/user-profile)
+* [A/B Tests](https://docs.devtodev.com/integration/integration-of-sdk-v2/a-b-testing)
 
 ## Changelog
 
