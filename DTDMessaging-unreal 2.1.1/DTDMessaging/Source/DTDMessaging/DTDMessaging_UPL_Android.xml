@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Plugin additions -->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Initialization log -->
+    <init>
+        <log text="DTDMessaging init"/>
+    </init>
+
+    <!-- Optional updates applied to AndroidManifest.xml -->
+    <androidManifestUpdates>
+        <addPermission android:name="android.permission.POST_NOTIFICATIONS"/>
+        
+        <addElements tag="application">
+            <service
+                android:name="com.devtodev.push.internal.logic.DTDFcmMessagingService"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                </intent-filter>
+            </service>
+
+            <receiver
+                android:name="com.devtodev.push.internal.logic.PushClickReceiver"
+                android:enabled="true"
+                android:exported="true">
+                <intent-filter>
+                    <action android:name="com.devtodev.android.push.CLICKED" />
+                </intent-filter>
+            </receiver>
+        </addElements>
+    </androidManifestUpdates>
+
+    <!-- Copy the generated resource file to be packaged -->
+    <resourceCopies>
+        <!-- copyGoogleJson -->
+        <copyDir src="$S(PluginDir)/../../ThirdParty/Android" dst="$S(BuildDir)" />
+		<copyFile src="$S(ProjectDir)/google-services.json" dst="$S(BuildDir)/gradle/app/google-services.json" />
+        <copyFile src="$S(ProjectDir)/google-services.json" dst="$S(BuildDir)/gradle/AFSProject/app/src/release/google-services.json" />
+        <copyFile src="$S(ProjectDir)/google-services.json" dst="$S(BuildDir)/gradle/AFSProject/app/src/google-services.json" />
+        <copyFile src="$S(ProjectDir)/google-services.json" dst="$S(BuildDir)/gradle/AFSProject/app/src/Release/google-services.json" />
+        <copyFile src="$S(ProjectDir)/google-services.json" dst="$S(BuildDir)/gradle/AFSProject/app/google-services.json" />
+        <!-- copy d2d aar  -->
+        <copyFile 
+            src="$S(ProjectDir)/Plugins/DTDMessaging/ThirdParty/Android/com/devtodev/android-messaging/2.3.5/android-messaging-2.3.5.aar" 
+            dst="$S(BuildDir)/gradle/AFSProject/app/libs/android-messaging-2.3.5.aar" />
+   	    <copyFile 
+            src="$S(ProjectDir)/Plugins/DTDMessaging/ThirdParty/Android/com/devtodev/android-messaging/2.3.5/android-messaging-2.3.5.aar" 
+            dst="$S(BuildDir)/gradle/app/libs/android-messaging-2.3.5.aar" />
+    </resourceCopies>
+    
+    <!-- Optional base build.gradle additions -->
+    <buildGradleAdditions>
+        <insert>
+            dependencies {
+                implementation fileTree(dir: "libs", include: ["*.aar"])
+                implementation 'com.google.android.gms:play-services-base:17.1.0'
+                implementation 'com.google.firebase:firebase-core:20.1.2'
+                implementation 'com.google.firebase:firebase-messaging:23.0.2'
+            }
+
+            android {
+				defaultConfig {
+					multiDexEnabled true
+				}
+
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_1_8
+                    targetCompatibility = JavaVersion.VERSION_1_8
+                }
+
+                buildTypes {
+                    release {
+                        minifyEnabled false
+                    }
+                }
+			}
+
+            apply plugin: 'com.google.gms.google-services'
+        </insert>
+    </buildGradleAdditions>
+
+    <!-- Optional base build.gradle buildscript additions -->
+    <buildscriptGradleAdditions>
+        <insert>
+            dependencies {
+                classpath 'com.google.gms:google-services:4.3.10'
+            }
+        </insert>
+    </buildscriptGradleAdditions>
+
+    <!-- Additions to the GameActivity imports in GameActivity.java -->
+    <gameActivityImportAdditions>
+        <insert>
+import com.devtodev.push.unrealwrapper.*;
+		</insert>
+    </gameActivityImportAdditions>
+
+     <!-- Additions to the GameActivity class in GameActivity.java -->
+    <gameActivityClassAdditions>
+        <insert>
+public class DevToDevPushListenerUnreal implements DTDPushListenerUnreal
+{
+    public native void RegistrationSuccessful(String token);
+    public native void RegistrationFailed(String error);
+    public native void NotificationReceived(HashMap&lt;String, String&gt; pushData);
+    public native void NotificationOpened(HashMap&lt;String, String&gt; pushData, HashMap&lt;String, String&gt; actionButton);
+    
+    public DevToDevPushListenerUnreal()
+    {
+    }
+
+    @Override
+    public void onPushServiceRegistrationSuccessful(String token)
+    {
+        RegistrationSuccessful(token);
+    }
+
+    @Override
+    public void onPushServiceRegistrationFailed(String error)
+    {
+        RegistrationFailed(error);
+    }
+
+    @Override
+    public void onPushNotificationReceived(HashMap&lt;String, String&gt; pushData)
+    {
+        NotificationReceived(pushData);
+    }
+
+    @Override
+    public void onPushNotificationOpened(HashMap&lt;String, String&gt; pushData, HashMap&lt;String, String&gt; actionButton)
+    {
+        NotificationOpened(pushData, actionButton);
+    }
+}
+
+public class DevToDevPushGetterBoolCallback implements IGetterBool
+{
+    private final Object pointer;
+    public native void CallbackHandler(Object pointer, boolean result);
+
+    public DevToDevPushGetterBoolCallback(Object pointer)
+    {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(Boolean result)
+    {
+        CallbackHandler(pointer, result == null ? false : result.booleanValue());
+    }
+}
+
+public class DevToDevPushGetterStringCallback implements IGetterString
+{
+    private final Object pointer;
+    public native void CallbackHandler(Object pointer, String result);
+
+    public DevToDevPushGetterStringCallback(Object pointer)
+    {
+        this.pointer = pointer;
+    }
+
+    @Override
+    public void onResult(String result)
+    {
+        CallbackHandler(pointer, result);
+    }
+}
+        </insert>
+    </gameActivityClassAdditions>
+
+</root>
