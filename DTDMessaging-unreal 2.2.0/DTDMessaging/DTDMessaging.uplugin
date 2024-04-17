@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"Version": 2,
+	"VersionName": "2.2.0",
+	"FriendlyName": "DTDMessaging",
+	"Description": "DevToDev Messaging Library",
+	"Category": "Other",
+	"CreatedBy": "DevToDev",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "DTDMessaging",
+			"Type": "Runtime",
+			"LoadingPhase": "PreLoadingScreen"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "DTDAnalytics",
+			"Enabled": true
+		}
+	],
+	"IsExperimentalVersion": false
+}
