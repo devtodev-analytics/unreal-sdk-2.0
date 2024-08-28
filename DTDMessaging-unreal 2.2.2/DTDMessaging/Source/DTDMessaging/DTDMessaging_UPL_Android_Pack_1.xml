@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Plugin additions -->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Initialization log -->
+    <init>
+        <log text="DTDMessaging add androidx.multidex:multidex"/>
+    </init>
+
+    <!-- Optional updates applied to AndroidManifest.xml -->
+    <androidManifestUpdates>
+        <addAttribute tag="application" name="android:name" value="androidx.multidex.MultiDexApplication"/>
+    </androidManifestUpdates>
+    
+    <!-- Optional base build.gradle additions -->
+    <buildGradleAdditions>
+        <insert>
+            dependencies {
+                implementation 'androidx.multidex:multidex:2.0.1'
+            }
+
+            android {
+                compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_1_8
+                    targetCompatibility = JavaVersion.VERSION_1_8
+                }
+                
+                defaultConfig {
+					multiDexEnabled true
+				}
+			}
+        </insert>
+    </buildGradleAdditions>
+</root>

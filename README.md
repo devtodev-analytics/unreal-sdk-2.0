@@ -2,7 +2,7 @@
 
 ## Latest Version
 
-_July 4, 2024_ - [v2.2.1](https://github.com/devtodev-analytics/unreal-sdk-2.0/releases/latest)
+_August 28, 2024_ - [v2.2.2](https://github.com/devtodev-analytics/unreal-sdk-2.0/releases/latest)
 
 ## Documentation
 
